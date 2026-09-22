@@ -4,6 +4,8 @@ import { runMigrations } from './db/migrations'
 import { registerUserHandlers } from './ipc/user.handlers'
 import { registerTaskHandlers } from './ipc/tasks.handlers'
 import { registerSessionHandlers } from './ipc/sessions.handlers'
+import { registerRoutineHandlers } from './ipc/routine.handlers'
+import { registerStatsHandlers } from './ipc/stats.handlers'
 
 // Evita crash fatal em ambientes com driver/GPU instável (comum em algumas
 // distros Linux) — o app é leve o suficiente para não depender de aceleração de hardware.
@@ -43,6 +45,8 @@ app.whenReady().then(() => {
   registerUserHandlers()
   registerTaskHandlers()
   registerSessionHandlers()
+  registerRoutineHandlers()
+  registerStatsHandlers()
   createWindow()
 
   app.on('activate', () => {

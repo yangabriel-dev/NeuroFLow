@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import api from '../../services/api'
 import { useTimerStore } from '../../store/useTimerStore'
@@ -6,7 +6,7 @@ import { useTaskStore } from '../../store/useTaskStore'
 import { useUserStore } from '../../store/useUserStore'
 import NeonButton from '../ui/NeonButton'
 
-const DURATION_CHIPS = [25, 45, 50, 90]
+const BASE_DURATION_CHIPS = [25, 45, 50, 90]
 
 function formatTime(totalSeconds: number): string {
   const sign = totalSeconds < 0 ? '-' : ''
@@ -31,6 +31,16 @@ function FloatingTimer(): React.JSX.Element {
   const upsertTask = useTaskStore((s) => s.upsertTask)
   const setUser = useUserStore((s) => s.setUser)
   const notifiedRef = useRef(false)
+  const [durationChips, setDurationChips] = useState(BASE_DURATION_CHIPS)
+
+  useEffect(() => {
+    api.routine.get().then((routine) => {
+      const chips = BASE_DURATION_CHIPS.includes(routine.sessionDurationMinutes)
+        ? BASE_DURATION_CHIPS
+        : [routine.sessionDurationMinutes, ...BASE_DURATION_CHIPS].sort((a, b) => a - b)
+      setDurationChips(chips)
+    })
+  }, [])
 
   useEffect(() => {
     if (status !== 'running') return undefined
@@ -97,7 +107,7 @@ function FloatingTimer(): React.JSX.Element {
           </div>
 
           <div className="mt-3 flex flex-wrap gap-1">
-            {DURATION_CHIPS.map((minutes) => (
+            {durationChips.map((minutes) => (
               <button
                 key={minutes}
                 type="button"

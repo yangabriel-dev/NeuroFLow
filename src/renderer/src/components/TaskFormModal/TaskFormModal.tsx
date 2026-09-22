@@ -3,15 +3,7 @@ import type { FormEvent } from 'react'
 import type { NewTaskInput, StudyMethod, Task } from '@shared/types'
 import Modal from '../ui/Modal'
 import NeonButton from '../ui/NeonButton'
-
-const METHOD_OPTIONS: { value: StudyMethod; label: string }[] = [
-  { value: 'feynman', label: 'Feynman Technique' },
-  { value: 'active_recall', label: 'Active Recall' },
-  { value: 'spaced_repetition', label: 'Spaced Repetition' },
-  { value: 'interleaving', label: 'Interleaving' },
-  { value: 'elaboration', label: 'Elaborative Interrogation' },
-  { value: 'dual_coding', label: 'Dual Coding' }
-]
+import { METHOD_OPTIONS } from '../../constants/methods'
 
 const inputClass =
   'rounded-lg border border-neon-purple/30 bg-black/30 px-4 py-2 text-text-primary placeholder:text-text-secondary/50 focus:border-neon-cyan focus:bg-neon-cyan/5 focus:shadow-neon-cyan focus:outline-none'

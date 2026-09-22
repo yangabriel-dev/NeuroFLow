@@ -1,37 +1,39 @@
+import { useNavStore } from '../../store/useNavStore'
+import type { NavView } from '../../store/useNavStore'
+
 interface NavItem {
   label: string
-  active: boolean
+  view: NavView
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Home', active: true },
-  { label: 'Rotina', active: false },
-  { label: 'Métodos', active: false },
-  { label: 'Stats', active: false },
-  { label: 'Config', active: false }
+  { label: 'Home', view: 'home' },
+  { label: 'Rotina', view: 'routine' },
+  { label: 'Métodos', view: 'methods' },
+  { label: 'Stats', view: 'stats' },
+  { label: 'Config', view: 'settings' }
 ]
 
 function Sidebar(): React.JSX.Element {
+  const activeView = useNavStore((s) => s.activeView)
+  const setActiveView = useNavStore((s) => s.setActiveView)
+
   return (
     <nav className="flex w-60 shrink-0 flex-col gap-1 border-r border-neon-cyan/20 bg-bg-card/40 p-4">
-      {NAV_ITEMS.map((item) =>
-        item.active ? (
-          <div
-            key={item.label}
-            className="rounded-lg border border-neon-cyan/40 bg-neon-cyan/10 px-4 py-2 font-bold text-neon-cyan"
-          >
-            {item.label}
-          </div>
-        ) : (
-          <div
-            key={item.label}
-            className="flex cursor-not-allowed items-center justify-between rounded-lg px-4 py-2 text-text-secondary/50"
-          >
-            <span>{item.label}</span>
-            <span className="text-[10px]">em breve</span>
-          </div>
-        )
-      )}
+      {NAV_ITEMS.map((item) => (
+        <button
+          key={item.view}
+          type="button"
+          onClick={() => setActiveView(item.view)}
+          className={
+            activeView === item.view
+              ? 'rounded-lg border border-neon-cyan/40 bg-neon-cyan/10 px-4 py-2 text-left font-bold text-neon-cyan'
+              : 'rounded-lg px-4 py-2 text-left text-text-secondary transition-colors hover:bg-bg-hover/50 hover:text-text-primary'
+          }
+        >
+          {item.label}
+        </button>
+      ))}
     </nav>
   )
 }

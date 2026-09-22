@@ -8,6 +8,7 @@ import { useTaskStore } from '../store/useTaskStore'
 import { useTimerStore } from '../store/useTimerStore'
 import Card from '../components/ui/Card'
 import NeonButton from '../components/ui/NeonButton'
+import ProgressBar from '../components/ui/ProgressBar'
 import TaskItem from '../components/TaskItem/TaskItem'
 import TaskFormModal from '../components/TaskFormModal/TaskFormModal'
 
@@ -95,6 +96,18 @@ function Home(): React.JSX.Element {
           >
             Começar Sessão
           </NeonButton>
+        </Card>
+      </motion.div>
+
+      <motion.div variants={itemVariants}>
+        <Card>
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-text-primary">Level {user?.currentLevel ?? 1}</h2>
+            <span className="font-mono text-sm text-text-secondary">{(user?.totalXp ?? 0) % 1000}/1000 XP</span>
+          </div>
+          <div className="mt-2">
+            <ProgressBar progress={((user?.totalXp ?? 0) % 1000) / 10} />
+          </div>
         </Card>
       </motion.div>
 

@@ -14,6 +14,7 @@ interface SessionRow {
   duration_minutes: number | null
   completed: number
   notes: string | null
+  xp_earned: number
 }
 
 function mapSession(row: SessionRow): Session {
@@ -27,7 +28,8 @@ function mapSession(row: SessionRow): Session {
     endTime: row.end_time,
     durationMinutes: row.duration_minutes,
     completed: row.completed === 1,
-    notes: row.notes
+    notes: row.notes,
+    xpEarned: row.xp_earned
   }
 }
 
@@ -52,7 +54,16 @@ function toDateStr(d: Date): string {
   return d.toISOString().slice(0, 10)
 }
 
-function recalcStreakAndHours(): void {
+const METHOD_XP_BONUS: Record<StudyMethod, number> = {
+  feynman: 20,
+  active_recall: 30,
+  spaced_repetition: 15,
+  interleaving: 15,
+  elaboration: 15,
+  dual_coding: 15
+}
+
+function recalcStreakHoursAndXp(xpDelta: number): void {
   const rows = db
     .prepare('SELECT DISTINCT date(start_time) as day FROM sessions WHERE completed = 1 ORDER BY day DESC')
     .all() as { day: string }[]
@@ -82,8 +93,14 @@ function recalcStreakAndHours(): void {
     .get() as { totalMinutes: number }
 
   db.prepare(
-    'UPDATE users SET streak_count = ?, total_hours = ? WHERE id = (SELECT id FROM users ORDER BY id LIMIT 1)'
-  ).run(streak, totalMinutes / 60)
+    `UPDATE users
+     SET streak_count = ?,
+         total_hours = ?,
+         max_streak_count = MAX(max_streak_count, ?),
+         total_xp = total_xp + ?,
+         current_level = ((total_xp + ?) / 1000) + 1
+     WHERE id = (SELECT id FROM users ORDER BY id LIMIT 1)`
+  ).run(streak, totalMinutes / 60, streak, xpDelta, xpDelta)
 }
 
 const runEndAndComplete = db.transaction(
@@ -94,16 +111,18 @@ const runEndAndComplete = db.transaction(
       1,
       Math.round((new Date(endTime).getTime() - new Date(session.startTime).getTime()) / 60000)
     )
+    const xpEarned = durationMinutes * 2 + (session.method ? METHOD_XP_BONUS[session.method] : 0)
 
-    db.prepare('UPDATE sessions SET end_time = ?, duration_minutes = ?, completed = 1 WHERE id = ?').run(
+    db.prepare('UPDATE sessions SET end_time = ?, duration_minutes = ?, completed = 1, xp_earned = ? WHERE id = ?').run(
       endTime,
       durationMinutes,
+      xpEarned,
       sessionId
     )
 
     db.prepare('UPDATE tasks SET is_completed = 1, completed_at = ? WHERE id = ?').run(endTime, session.taskId)
 
-    recalcStreakAndHours()
+    recalcStreakHoursAndXp(xpEarned)
 
     return {
       session: getById(sessionId),

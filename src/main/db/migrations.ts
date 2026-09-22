@@ -55,7 +55,20 @@ export function runMigrations(): void {
     CREATE INDEX IF NOT EXISTS idx_sessions_task ON sessions(task_id);
   `)
 
+  addColumnIfMissing('routines', 'session_duration_minutes', 'INTEGER NOT NULL DEFAULT 90')
+  addColumnIfMissing('routines', 'daily_hours_goal', 'REAL NOT NULL DEFAULT 6')
+  addColumnIfMissing('routines', 'weekly_exercises_goal', 'INTEGER NOT NULL DEFAULT 50')
+  addColumnIfMissing('routines', 'monthly_projects_goal', 'INTEGER NOT NULL DEFAULT 1')
+  addColumnIfMissing('routines', 'method_distribution', 'TEXT')
+  addColumnIfMissing('users', 'max_streak_count', 'INTEGER NOT NULL DEFAULT 0')
+
   seedIfEmpty()
+}
+
+function addColumnIfMissing(table: string, column: string, definition: string): void {
+  const columns = db.pragma(`table_info(${table})`) as { name: string }[]
+  if (columns.some((c) => c.name === column)) return
+  db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
 }
 
 function seedIfEmpty(): void {

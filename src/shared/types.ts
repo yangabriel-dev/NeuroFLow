@@ -47,6 +47,43 @@ export interface Session {
   durationMinutes: number | null
   completed: boolean
   notes: string | null
+  xpEarned: number
+}
+
+export type MethodDistribution = Partial<Record<StudyMethod, number>>
+
+export interface Routine {
+  id: number
+  period: string | null
+  sessionDurationMinutes: number
+  dailyHoursGoal: number
+  weeklyExercisesGoal: number
+  monthlyProjectsGoal: number
+  methodDistribution: MethodDistribution | null
+}
+
+export interface RoutineSettingsInput {
+  period?: string | null
+  sessionDurationMinutes?: number
+  dailyHoursGoal?: number
+  weeklyExercisesGoal?: number
+  monthlyProjectsGoal?: number
+  methodDistribution?: MethodDistribution | null
+}
+
+export interface StatsSnapshot {
+  dailyHours: { date: string; hours: number }[]
+  methodBreakdown: { method: StudyMethod; sessions: number; percent: number }[]
+  streakCalendar: { date: string; studied: boolean }[]
+  summary: {
+    totalHours: number
+    avgDailyHours: number
+    bestDayHours: number
+    currentStreak: number
+    maxStreak: number
+    sessionsCompleted: number
+    sessionsCompletedThisWeek: number
+  }
 }
 
 export interface Api {
@@ -65,6 +102,13 @@ export interface Api {
     start(taskId: number): Promise<Session>
     end(sessionId: number): Promise<{ session: Session; task: Task; user: User }>
     discard(sessionId: number): Promise<{ id: number }>
+  }
+  routine: {
+    get(): Promise<Routine>
+    updateSettings(patch: RoutineSettingsInput): Promise<Routine>
+  }
+  stats: {
+    get(): Promise<StatsSnapshot>
   }
 }
 
