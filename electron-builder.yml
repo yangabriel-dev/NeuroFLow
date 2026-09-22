@@ -1,0 +1,10 @@
+appId: com.neuroflow.app
+productName: NeuroFlow
+directories:
+  output: dist-electron
+files:
+  - out/**/*
+asarUnpack:
+  - '**/node_modules/better-sqlite3/**'
+linux:
+  target: AppImage
