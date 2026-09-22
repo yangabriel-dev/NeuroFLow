@@ -11,6 +11,7 @@ import NeonButton from '../components/ui/NeonButton'
 import ProgressBar from '../components/ui/ProgressBar'
 import TaskItem from '../components/TaskItem/TaskItem'
 import TaskFormModal from '../components/TaskFormModal/TaskFormModal'
+import { getLevelTitle } from '../constants/levelTitles'
 
 const containerVariants: Variants = {
   hidden: {},
@@ -102,7 +103,9 @@ function Home(): React.JSX.Element {
       <motion.div variants={itemVariants}>
         <Card>
           <div className="flex items-center justify-between">
-            <h2 className="font-bold text-text-primary">Level {user?.currentLevel ?? 1}</h2>
+            <h2 className="font-bold text-text-primary">
+              Level {user?.currentLevel ?? 1} · {getLevelTitle(user?.currentLevel ?? 1)}
+            </h2>
             <span className="font-mono text-sm text-text-secondary">{(user?.totalXp ?? 0) % 1000}/1000 XP</span>
           </div>
           <div className="mt-2">

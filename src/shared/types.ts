@@ -129,7 +129,9 @@ export interface Api {
   }
   sessions: {
     start(taskId: number): Promise<Session>
-    end(sessionId: number): Promise<{ session: Session; task: Task; user: User }>
+    end(
+      sessionId: number
+    ): Promise<{ session: Session; task: Task; user: User; newAchievements: Achievement[] }>
     discard(sessionId: number): Promise<{ id: number }>
   }
   routine: {

@@ -4,6 +4,7 @@ import api from '../../services/api'
 import { useTimerStore } from '../../store/useTimerStore'
 import { useTaskStore } from '../../store/useTaskStore'
 import { useUserStore } from '../../store/useUserStore'
+import { useToastStore } from '../../store/useToastStore'
 import NeonButton from '../ui/NeonButton'
 
 const BASE_DURATION_CHIPS = [25, 45, 50, 90]
@@ -69,9 +70,14 @@ function FloatingTimer(): React.JSX.Element {
 
   function handleComplete(): void {
     if (sessionId === null) return
-    api.sessions.end(sessionId).then(({ task: updatedTask, user }) => {
+    api.sessions.end(sessionId).then(({ task: updatedTask, user, newAchievements }) => {
       upsertTask(updatedTask)
       setUser(user)
+      if (newAchievements.length > 0) {
+        useToastStore
+          .getState()
+          .show(`Novo badge: ${newAchievements.map((a) => a.label).join(', ')}!`)
+      }
       reset()
     })
   }

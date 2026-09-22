@@ -2,7 +2,7 @@ import { db } from './index'
 import { getActiveRoutineId, getDefaultUser } from './users.repository'
 import { getById as getTaskById } from './tasks.repository'
 import { evaluateAndUnlock } from './achievements.repository'
-import type { Session, StudyMethod, Task, User } from '@shared/types'
+import type { Achievement, Session, StudyMethod, Task, User } from '@shared/types'
 
 interface SessionRow {
   id: number
@@ -110,7 +110,7 @@ function recalcStreakHoursAndXp(xpDelta: number): void {
 }
 
 const runEndAndComplete = db.transaction(
-  (sessionId: number): { session: Session; task: Task; user: User } => {
+  (sessionId: number): { session: Session; task: Task; user: User; newAchievements: Achievement[] } => {
     const session = getById(sessionId)
     const endTime = new Date().toISOString()
     const durationMinutes = Math.max(
@@ -129,17 +129,20 @@ const runEndAndComplete = db.transaction(
     db.prepare('UPDATE tasks SET is_completed = 1, completed_at = ? WHERE id = ?').run(endTime, session.taskId)
 
     recalcStreakHoursAndXp(xpEarned)
-    evaluateAndUnlock()
+    const newAchievements = evaluateAndUnlock()
 
     return {
       session: getById(sessionId),
       task: getTaskById(session.taskId),
-      user: getDefaultUser()
+      user: getDefaultUser(),
+      newAchievements
     }
   }
 )
 
-export function endAndComplete(sessionId: number): { session: Session; task: Task; user: User } {
+export function endAndComplete(
+  sessionId: number
+): { session: Session; task: Task; user: User; newAchievements: Achievement[] } {
   return runEndAndComplete(sessionId)
 }
 

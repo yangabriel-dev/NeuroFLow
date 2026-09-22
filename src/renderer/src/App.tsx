@@ -7,9 +7,10 @@ import Home from './pages/Home'
 import Routine from './pages/Routine'
 import Stats from './pages/Stats'
 import Settings from './pages/Settings'
-import ComingSoon from './pages/ComingSoon'
+import Methods from './pages/Methods'
 import FloatingTimer from './components/Timer/FloatingTimer'
 import OnboardingModal from './components/Onboarding/OnboardingModal'
+import Toast from './components/ui/Toast'
 
 function App(): React.JSX.Element | null {
   const user = useUserStore((s) => s.user)
@@ -31,9 +32,10 @@ function App(): React.JSX.Element | null {
       {activeView === 'home' && <Home />}
       {activeView === 'routine' && <Routine />}
       {activeView === 'stats' && <Stats />}
-      {activeView === 'methods' && <ComingSoon title="🧠 Métodos de Aprendizado" />}
+      {activeView === 'methods' && <Methods />}
       {activeView === 'settings' && <Settings />}
       <FloatingTimer />
+      <Toast />
     </MainLayout>
   )
 }

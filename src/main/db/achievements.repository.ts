@@ -120,7 +120,7 @@ function computeStats(): BadgeStats {
   }
 }
 
-export function evaluateAndUnlock(): void {
+export function evaluateAndUnlock(): Achievement[] {
   const userId = getDefaultUser().id
   const earnedRows = db.prepare('SELECT badge_key FROM achievements WHERE user_id = ?').all(userId) as {
     badge_key: string
@@ -129,7 +129,7 @@ export function evaluateAndUnlock(): void {
 
   const stats = computeStats()
   const newlyEarned = BADGE_DEFINITIONS.filter((b) => !earnedKeys.has(b.key) && b.check(stats))
-  if (newlyEarned.length === 0) return
+  if (newlyEarned.length === 0) return []
 
   const insert = db.prepare('INSERT INTO achievements (user_id, badge_key) VALUES (?, ?)')
   for (const badge of newlyEarned) {
@@ -144,6 +144,9 @@ export function evaluateAndUnlock(): void {
     xpBonus,
     userId
   )
+
+  const newKeys = new Set(newlyEarned.map((b) => b.key))
+  return listAll().filter((a) => newKeys.has(a.key))
 }
 
 export function listAll(): Achievement[] {

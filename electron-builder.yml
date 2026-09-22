@@ -8,3 +8,5 @@ asarUnpack:
   - '**/node_modules/better-sqlite3/**'
 linux:
   target: AppImage
+  icon: resources/icon.png
+  category: Education
