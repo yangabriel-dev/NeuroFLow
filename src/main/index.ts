@@ -6,6 +6,8 @@ import { registerTaskHandlers } from './ipc/tasks.handlers'
 import { registerSessionHandlers } from './ipc/sessions.handlers'
 import { registerRoutineHandlers } from './ipc/routine.handlers'
 import { registerStatsHandlers } from './ipc/stats.handlers'
+import { registerAppHandlers } from './ipc/app.handlers'
+import { registerAchievementHandlers } from './ipc/achievements.handlers'
 
 // Evita crash fatal em ambientes com driver/GPU instável (comum em algumas
 // distros Linux) — o app é leve o suficiente para não depender de aceleração de hardware.
@@ -47,6 +49,8 @@ app.whenReady().then(() => {
   registerSessionHandlers()
   registerRoutineHandlers()
   registerStatsHandlers()
+  registerAppHandlers()
+  registerAchievementHandlers()
   createWindow()
 
   app.on('activate', () => {

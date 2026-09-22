@@ -1,5 +1,5 @@
 import { db } from './index'
-import type { User } from '@shared/types'
+import type { User, UserSettingsInput } from '@shared/types'
 
 interface UserRow {
   id: number
@@ -10,6 +10,7 @@ interface UserRow {
   total_xp: number
   total_hours: number
   streak_count: number
+  notifications_enabled: number
 }
 
 function mapUser(row: UserRow): User {
@@ -21,7 +22,8 @@ function mapUser(row: UserRow): User {
     currentLevel: row.current_level,
     totalXp: row.total_xp,
     totalHours: row.total_hours,
-    streakCount: row.streak_count
+    streakCount: row.streak_count,
+    notificationsEnabled: row.notifications_enabled === 1
   }
 }
 
@@ -32,6 +34,17 @@ export function getDefaultUser(): User {
 
 export function updateUserName(name: string): User {
   db.prepare('UPDATE users SET name = ? WHERE id = (SELECT id FROM users ORDER BY id LIMIT 1)').run(name)
+  return getDefaultUser()
+}
+
+export function updateSettings(patch: UserSettingsInput): User {
+  const current = getDefaultUser()
+  const notificationsEnabled = patch.notificationsEnabled ?? current.notificationsEnabled
+
+  db.prepare(
+    'UPDATE users SET notifications_enabled = ? WHERE id = (SELECT id FROM users ORDER BY id LIMIT 1)'
+  ).run(notificationsEnabled ? 1 : 0)
+
   return getDefaultUser()
 }
 

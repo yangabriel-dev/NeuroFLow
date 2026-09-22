@@ -1,6 +1,7 @@
 import { db } from './index'
 import { getActiveRoutineId, getDefaultUser } from './users.repository'
 import { getById as getTaskById } from './tasks.repository'
+import { evaluateAndUnlock } from './achievements.repository'
 import type { Session, StudyMethod, Task, User } from '@shared/types'
 
 interface SessionRow {
@@ -36,6 +37,11 @@ function mapSession(row: SessionRow): Session {
 function getById(id: number): Session {
   const row = db.prepare('SELECT * FROM sessions WHERE id = ?').get(id) as SessionRow
   return mapSession(row)
+}
+
+export function listAll(): Session[] {
+  const rows = db.prepare('SELECT * FROM sessions ORDER BY start_time').all() as SessionRow[]
+  return rows.map(mapSession)
 }
 
 export function start(taskId: number): Session {
@@ -98,7 +104,7 @@ function recalcStreakHoursAndXp(xpDelta: number): void {
          total_hours = ?,
          max_streak_count = MAX(max_streak_count, ?),
          total_xp = total_xp + ?,
-         current_level = ((total_xp + ?) / 1000) + 1
+         current_level = CAST((total_xp + ?) / 1000 AS INTEGER) + 1
      WHERE id = (SELECT id FROM users ORDER BY id LIMIT 1)`
   ).run(streak, totalMinutes / 60, streak, xpDelta, xpDelta)
 }
@@ -123,6 +129,7 @@ const runEndAndComplete = db.transaction(
     db.prepare('UPDATE tasks SET is_completed = 1, completed_at = ? WHERE id = ?').run(endTime, session.taskId)
 
     recalcStreakHoursAndXp(xpEarned)
+    evaluateAndUnlock()
 
     return {
       session: getById(sessionId),

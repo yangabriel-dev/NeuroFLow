@@ -29,6 +29,7 @@ function FloatingTimer(): React.JSX.Element {
   const start = useTimerStore((s) => s.start)
 
   const upsertTask = useTaskStore((s) => s.upsertTask)
+  const user = useUserStore((s) => s.user)
   const setUser = useUserStore((s) => s.setUser)
   const notifiedRef = useRef(false)
   const [durationChips, setDurationChips] = useState(BASE_DURATION_CHIPS)
@@ -55,9 +56,11 @@ function FloatingTimer(): React.JSX.Element {
     }
     if (remainingSeconds === 0 && !notifiedRef.current) {
       notifiedRef.current = true
-      new Notification('Sessão concluída!', { body: task ? task.title : 'Tempo esgotado' })
+      if (user?.notificationsEnabled) {
+        new Notification('Sessão concluída!', { body: task ? task.title : 'Tempo esgotado' })
+      }
     }
-  }, [remainingSeconds, status, task])
+  }, [remainingSeconds, status, task, user])
 
   function handleChipClick(minutes: number): void {
     if (!task || sessionId === null) return

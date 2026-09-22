@@ -15,6 +15,11 @@ export interface User {
   totalXp: number
   totalHours: number
   streakCount: number
+  notificationsEnabled: boolean
+}
+
+export interface UserSettingsInput {
+  notificationsEnabled?: boolean
 }
 
 export interface Task {
@@ -86,10 +91,34 @@ export interface StatsSnapshot {
   }
 }
 
+export interface AppInfo {
+  name: string
+  version: string
+}
+
+export interface Achievement {
+  key: string
+  label: string
+  description: string
+  xpBonus: number
+  earned: boolean
+  earnedAt: string | null
+}
+
+export interface ExportSnapshot {
+  exportedAt: string
+  user: User
+  routine: Routine
+  tasks: Task[]
+  sessions: Session[]
+  achievements: Achievement[]
+}
+
 export interface Api {
   user: {
     get(): Promise<User>
     updateName(name: string): Promise<User>
+    updateSettings(patch: UserSettingsInput): Promise<User>
   }
   tasks: {
     list(): Promise<Task[]>
@@ -109,6 +138,14 @@ export interface Api {
   }
   stats: {
     get(): Promise<StatsSnapshot>
+  }
+  app: {
+    getInfo(): Promise<AppInfo>
+    exportData(): Promise<{ canceled: boolean; path?: string }>
+    resetData(): Promise<void>
+  }
+  achievements: {
+    list(): Promise<Achievement[]>
   }
 }
 

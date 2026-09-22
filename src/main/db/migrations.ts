@@ -50,6 +50,14 @@ export function runMigrations(): void {
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS achievements (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      badge_key TEXT NOT NULL,
+      earned_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(user_id, badge_key)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_tasks_routine ON tasks(routine_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_routine ON sessions(routine_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_task ON sessions(task_id);
@@ -61,6 +69,7 @@ export function runMigrations(): void {
   addColumnIfMissing('routines', 'monthly_projects_goal', 'INTEGER NOT NULL DEFAULT 1')
   addColumnIfMissing('routines', 'method_distribution', 'TEXT')
   addColumnIfMissing('users', 'max_streak_count', 'INTEGER NOT NULL DEFAULT 0')
+  addColumnIfMissing('users', 'notifications_enabled', 'INTEGER NOT NULL DEFAULT 1')
 
   seedIfEmpty()
 }

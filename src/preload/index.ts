@@ -1,10 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { Api, NewTaskInput, RoutineSettingsInput } from '@shared/types'
+import type { Api, NewTaskInput, RoutineSettingsInput, UserSettingsInput } from '@shared/types'
 
 const api: Api = {
   user: {
     get: () => ipcRenderer.invoke('user:get'),
-    updateName: (name) => ipcRenderer.invoke('user:updateName', name)
+    updateName: (name) => ipcRenderer.invoke('user:updateName', name),
+    updateSettings: (patch: UserSettingsInput) => ipcRenderer.invoke('user:updateSettings', patch)
   },
   tasks: {
     list: () => ipcRenderer.invoke('tasks:list'),
@@ -24,6 +25,14 @@ const api: Api = {
   },
   stats: {
     get: () => ipcRenderer.invoke('stats:get')
+  },
+  app: {
+    getInfo: () => ipcRenderer.invoke('app:getInfo'),
+    exportData: () => ipcRenderer.invoke('app:exportData'),
+    resetData: () => ipcRenderer.invoke('app:resetData')
+  },
+  achievements: {
+    list: () => ipcRenderer.invoke('achievements:list')
   }
 }
 

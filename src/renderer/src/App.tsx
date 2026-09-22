@@ -6,6 +6,7 @@ import MainLayout from './components/layout/MainLayout'
 import Home from './pages/Home'
 import Routine from './pages/Routine'
 import Stats from './pages/Stats'
+import Settings from './pages/Settings'
 import ComingSoon from './pages/ComingSoon'
 import FloatingTimer from './components/Timer/FloatingTimer'
 import OnboardingModal from './components/Onboarding/OnboardingModal'
@@ -31,7 +32,7 @@ function App(): React.JSX.Element | null {
       {activeView === 'routine' && <Routine />}
       {activeView === 'stats' && <Stats />}
       {activeView === 'methods' && <ComingSoon title="🧠 Métodos de Aprendizado" />}
-      {activeView === 'settings' && <ComingSoon title="⚙️ Configurações" />}
+      {activeView === 'settings' && <Settings />}
       <FloatingTimer />
     </MainLayout>
   )
